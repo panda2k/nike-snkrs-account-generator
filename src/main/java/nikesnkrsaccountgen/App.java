@@ -1,8 +1,9 @@
 package nikesnkrsaccountgen;
 
-public class App 
-{
+public class App {
     public static void main( String[] args ) {
-        System.out.println( "Hello World!" );
+        System.setProperty("webdriver.gecko.driver","geckodriver.exe");
+        GmailGen gen = new GmailGen();
+        gen.getPhoneNumber();
     }
 }
