@@ -1,6 +1,7 @@
 package nikesnkrsaccountgen;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Gmail {
     String emailAddress;
@@ -8,7 +9,7 @@ public class Gmail {
     String firstName;
     String lastName;
     String gender;
-    Date dateOfBirth;
+    GregorianCalendar dateOfBirth;
 
     public Gmail(String emailAddress, String password) {
         this.emailAddress = emailAddress;
@@ -23,8 +24,8 @@ public class Gmail {
         this.lastName = lastName;
     }
 
-    public void setDateOfBirth(int year, int month, int day) {
-        dateOfBirth = new Date(year, month, day); // deprecated but its ok for this purpose
+    public void setDateOfBirth(GregorianCalendar dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public void setGender(String gender) {
