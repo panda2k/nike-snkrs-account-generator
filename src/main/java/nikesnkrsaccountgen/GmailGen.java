@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.Scanner;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.HttpPost;
@@ -55,6 +57,7 @@ public class GmailGen {
         String phoneNumber = getPhoneNumber();
         String verificationMessage;
         String verificationCode = "";
+        WebDriverWait waiter = new WebDriverWait(driver, 10);
 
         newGmail.setFirstName(getFirstName());
         newGmail.setLastName(getLastName());
@@ -91,40 +94,20 @@ public class GmailGen {
         
         System.out.println("Verification code:" + verificationCode);
         
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            System.out.println("error sleeping");
-        }
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("code"))); 
         driver.findElement(By.id("code")).sendKeys(verificationCode);
         driver.findElement(By.id("gradsIdvVerifyNext")).click();
 
         System.out.println("Clicked");
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            System.out.println("error sleeping");
-        }
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("month"))); 
         enterRandomInfo();
         driver.findElement(By.id("personalDetailsNext")).click();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            System.out.println("error sleeping");
-        }
-        if(driver.findElements(By.id("phoneUsageNext")).size() != 0) {
-            System.out.println("Found extra form");
-            driver.findElement(By.id("phoneUsageNext")).click();
-        }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            System.out.println("error sleeping");
-        } 
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneUsageNext"))); 
+        driver.findElement(By.id("phoneUsageNext")).click();
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[contains(text(), 'I agree')]"))); 
         while(driver.findElements(By.xpath("//*[contains(text(), 'I agree')]")).size() == 0) {
             driver.findElement(By.xpath("//a[@role = 'button']")).click();
         }
-
         System.out.println("Finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
         return newGmail;
     }
