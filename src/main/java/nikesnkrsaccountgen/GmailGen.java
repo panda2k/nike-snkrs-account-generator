@@ -54,29 +54,31 @@ public class GmailGen {
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
         String phoneNumber = getPhoneNumber();
+        String firstName = getFirstName();
+        String lastName = getLastName();
         String verificationMessage;
         String verificationCode = "";
         WebDriverWait waiter = new WebDriverWait(driver, 10);
 
-        newGmail.setFirstName(getFirstName());
-        newGmail.setLastName(getLastName());
-
         driver.get("https://accounts.google.com/SignUp");
-        driver.findElement(By.name("firstName")).sendKeys(newGmail.getFirstName());
-        driver.findElement(By.name("lastName")).sendKeys(newGmail.getLastName());
+
+        driver.findElement(By.name("firstName")).sendKeys(firstName);
+        driver.findElement(By.name("lastName")).sendKeys(lastName);
         driver.findElement(By.name("Passwd")).sendKeys(password);
         driver.findElement(By.name("ConfirmPasswd")).sendKeys(password);
         
         // keep trying email addresses until they are valid
         do {
             emailEnding = randomNumberString(10);
-            driver.findElement(By.name("Username")).sendKeys(newGmail.getFirstName() + newGmail.getLastName().charAt(0) + emailEnding);
+            driver.findElement(By.name("Username")).sendKeys(firstName + lastName.charAt(0) + emailEnding);
             driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
         } while(driver.findElements(By.xpath("//*[contains(text(), 'That username is taken. Try another.')]")).size() != 0);
+        
+        newGmail = new Gmail(firstName + lastName.charAt(0) + emailEnding + "@gmail.com", password);
+        newGmail.setFirstName(getFirstName());
+        newGmail.setLastName(getLastName());
 
-        newGmail = new Gmail(newGmail.getFirstName() + newGmail.getLastName().charAt(0) + emailEnding + "@gmail.com", password);
-
-        //phoneNumber = "2065663685"; // comment later
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneNumberId")));
         driver.findElement(By.id("phoneNumberId")).clear();
         driver.findElement(By.id("phoneNumberId")).sendKeys(phoneNumber);
         driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
@@ -203,7 +205,6 @@ public class GmailGen {
         }
 
         firstName = firstNames.get(randomGen.nextInt(firstNames.size()));
-
         return firstName;
     }
 
@@ -223,7 +224,7 @@ public class GmailGen {
         }
 
         lastName = lastNames.get(randomGen.nextInt(lastNames.size()));
-
+        
         return lastName;
     }
 

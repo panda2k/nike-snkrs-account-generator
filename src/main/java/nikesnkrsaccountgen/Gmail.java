@@ -13,10 +13,10 @@ public class Gmail {
     public Gmail(String emailAddress, String password) {
         this.emailAddress = emailAddress;
         this.password = password;
-    }    
+    }
 
     public void setFirstName(String firstName) {
-        this.firstName = lastName;
+        this.firstName = firstName;
     }
 
     public void setLastName(String lastName) {
