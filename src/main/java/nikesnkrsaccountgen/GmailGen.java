@@ -2,6 +2,9 @@ package nikesnkrsaccountgen;
 
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,47 +37,50 @@ public class GmailGen {
     final String username = "littlwang@gmail.com";
     final String token = "36d0674c163d6b68ae2ccc89e461ed1f";
 
+    private Gmail newGmail;
+
     public GmailGen() {
         driver = new FirefoxDriver();
     }
 
     public void generateGmail(String proxy) {
     // write later
+        Proxy gmailProxy = new Proxy();
+        gmailProxy.setHttpProxy(proxy);
     }
 
-    public String[][] generateGmail() {
-        String firstName = getFirstName();
-        String lastName = getLastName();
+    public Gmail generateGmail() {
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
         String phoneNumber = getPhoneNumber();
         String verificationMessage;
         String verificationCode = "";
-        String[][] emailArray = new String[1][2];
+
+        newGmail.setFirstName(getFirstName());
+        newGmail.setLastName(getLastName());
 
         driver.get("https://accounts.google.com/SignUp");
-        driver.findElement(By.name("firstName")).sendKeys(firstName);
-        driver.findElement(By.name("lastName")).sendKeys(lastName);
+        driver.findElement(By.name("firstName")).sendKeys(newGmail.getFirstName());
+        driver.findElement(By.name("lastName")).sendKeys(newGmail.getLastName());
         driver.findElement(By.name("Passwd")).sendKeys(password);
         driver.findElement(By.name("ConfirmPasswd")).sendKeys(password);
         
         // keep trying email addresses until they are valid
         do {
             emailEnding = randomNumberString(10);
-            driver.findElement(By.name("Username")).sendKeys(firstName + lastName.charAt(0) + emailEnding);
+            driver.findElement(By.name("Username")).sendKeys(newGmail.getFirstName() + newGmail.getLastName().charAt(0) + emailEnding);
             driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
         } while(driver.findElements(By.xpath("//*[contains(text(), 'That username is taken. Try another.')]")).size() != 0);
 
-        emailArray[0][0] = firstName + lastName.charAt(0) + emailEnding + "@gmail.com";
-        emailArray[0][1] = password;
+        newGmail = new Gmail(newGmail.getFirstName() + newGmail.getLastName().charAt(0) + emailEnding + "@gmail.com", password);
 
-        phoneNumber = "2065663685"; // comment later
+        //phoneNumber = "2065663685"; // comment later
         driver.findElement(By.id("phoneNumberId")).clear();
         driver.findElement(By.id("phoneNumberId")).sendKeys(phoneNumber);
         driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
 
         // get the verification code for gmail account
-        /*
+        
         verificationMessage = getMessage(phoneNumber);
         for(int count = 2; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
             if(Character.isDigit(verificationMessage.charAt(count))) {
@@ -82,8 +88,7 @@ public class GmailGen {
                 verificationCode += verificationMessage.charAt(count);
             }
         }
-        */
-
+        
         System.out.println("Verification code:" + verificationCode);
         
         try {
@@ -91,8 +96,7 @@ public class GmailGen {
         } catch (InterruptedException e) {
             System.out.println("error sleeping");
         }
-        //driver.findElement(By.id("code")).sendKeys(verificationCode);
-        //driver.findElement(By.xpath("//*[contains(text(), 'Verify')]")).click();
+        driver.findElement(By.id("code")).sendKeys(verificationCode);
         driver.findElement(By.id("gradsIdvVerifyNext")).click();
 
         System.out.println("Clicked");
@@ -121,8 +125,8 @@ public class GmailGen {
             driver.findElement(By.xpath("//a[@role = 'button']")).click();
         }
 
-        System.out.println("Finished created google account.\nEmail is " + emailArray[0][0] + "\nPassword is: " + emailArray[0][1]);
-        return emailArray;
+        System.out.println("Finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
+        return newGmail;
     }
 
     private String getPhoneNumber() {
@@ -247,13 +251,17 @@ public class GmailGen {
     * only to be used when the driver is on the google information screen
     */
         Random randomGen = new Random();
+        GregorianCalendar birthday = new GregorianCalendar(randomGen.nextInt(20) + 1970, randomGen.nextInt(12) + 1, randomGen.nextInt(28) + 1);
         Select month = new Select(driver.findElement(By.id("month")));
-        month.selectByValue(Integer.toString(randomGen.nextInt(12) + 1));
+        month.selectByValue(Integer.toString(birthday.get(Calendar.MONTH)));
 
-        driver.findElement(By.id("day")).sendKeys(Integer.toString(randomGen.nextInt(28) + 1));
-        driver.findElement(By.id("year")).sendKeys(Integer.toString(randomGen.nextInt(20) + 1970));
+        driver.findElement(By.id("day")).sendKeys(Integer.toString(birthday.get(Calendar.DAY_OF_MONTH)));
+        driver.findElement(By.id("year")).sendKeys(Integer.toString(birthday.get(Calendar.YEAR)));
 
         Select gender = new Select(driver.findElement(By.id("gender")));
-        gender.selectByValue(Integer.toString(randomGen.nextInt(2) + 1));
+        newGmail.setGender(randomGen.nextInt(2) + 1);
+        gender.selectByValue(Integer.toString(newGmail.getGender()));
+
+        newGmail.setDateOfBirth(birthday);
     }
 }
