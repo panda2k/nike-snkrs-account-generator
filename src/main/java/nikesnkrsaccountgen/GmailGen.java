@@ -3,7 +3,6 @@ package nikesnkrsaccountgen;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.io.File;
 import java.io.FileNotFoundException;
