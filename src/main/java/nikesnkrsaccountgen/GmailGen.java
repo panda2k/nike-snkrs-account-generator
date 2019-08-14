@@ -37,6 +37,7 @@ public class GmailGen {
     final String getSMSCodeAPIURL = "http://api.getsmscode.com/vndo.php";
     final String username = "littlwang@gmail.com";
     final String token = "36d0674c163d6b68ae2ccc89e461ed1f";
+    final int startingTypeSpeed = 75;
 
     private Gmail newGmail;
 
@@ -51,6 +52,7 @@ public class GmailGen {
     }
 
     public Gmail generateGmail() {
+        Random randomGen = new Random();
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
         String phoneNumber = getPhoneNumber();
@@ -62,15 +64,15 @@ public class GmailGen {
 
         driver.get("https://accounts.google.com/SignUp");
 
-        driver.findElement(By.name("firstName")).sendKeys(firstName);
-        driver.findElement(By.name("lastName")).sendKeys(lastName);
-        driver.findElement(By.name("Passwd")).sendKeys(password);
-        driver.findElement(By.name("ConfirmPasswd")).sendKeys(password);
+        typeKeys(firstName, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("firstName")));
+        typeKeys(lastName, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("lastName")));
+        typeKeys(password, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("Passwd")));
+        typeKeys(password, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("ConfirmPasswd")));
         
         // keep trying email addresses until they are valid
         do {
             emailEnding = randomNumberString(10);
-            driver.findElement(By.name("Username")).sendKeys(firstName + lastName.charAt(0) + emailEnding);
+            typeKeys(firstName + lastName.charAt(0) + emailEnding, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("Username")));
             driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
         } while(driver.findElements(By.xpath("//*[contains(text(), 'That username is taken. Try another.')]")).size() != 0);
         
@@ -79,16 +81,13 @@ public class GmailGen {
         newGmail.setLastName(getLastName());
 
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneNumberId")));
-        driver.findElement(By.id("phoneNumberId")).clear();
-        driver.findElement(By.id("phoneNumberId")).sendKeys(phoneNumber);
+        typeKeys(phoneNumber, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("phoneNumberId"))); 
         driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
 
         // get the verification code for gmail account
-        
         verificationMessage = getMessage(phoneNumber);
         for(int count = 2; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
             if(Character.isDigit(verificationMessage.charAt(count))) {
-                System.out.println("Is digit");
                 verificationCode += verificationMessage.charAt(count);
             }
         }
@@ -96,19 +95,28 @@ public class GmailGen {
         System.out.println("Verification code:" + verificationCode);
         
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("code"))); 
-        driver.findElement(By.id("code")).sendKeys(verificationCode);
+        typeKeys(phoneNumber, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("code"))); 
         driver.findElement(By.id("gradsIdvVerifyNext")).click();
 
-        System.out.println("Clicked");
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("month"))); 
         enterRandomInfo();
         driver.findElement(By.id("personalDetailsNext")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneUsageNext"))); 
         driver.findElement(By.id("phoneUsageNext")).click();
-        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[contains(text(), 'I agree')]"))); 
-        while(driver.findElements(By.xpath("//*[contains(text(), 'I agree')]")).size() == 0) {
-            driver.findElement(By.xpath("//a[@role = 'button']")).click();
+        System.out.println("Almost finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
+        // remove later
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            //TODO: handle exception
         }
+        System.out.println("size of button list " + driver.findElements(By.xpath("//button[@aria-label='Scroll down']")).size());
+        waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@aria-label='Scroll down']")));
+        while(driver.findElements(By.xpath("//*[contains(text(), 'I agree')]")).size() == 0) {
+            driver.findElement(By.xpath("//button[@aria-label='Scroll down']")).click();
+            System.out.println("Clicking scroll down");
+        }
+        driver.findElement(By.xpath("//*[contains(text(), 'I agree')]")).click();
         System.out.println("Finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
         return newGmail;
     }
@@ -237,14 +245,25 @@ public class GmailGen {
         GregorianCalendar birthday = new GregorianCalendar(randomGen.nextInt(20) + 1970, randomGen.nextInt(12) + 1, randomGen.nextInt(28) + 1);
         Select month = new Select(driver.findElement(By.id("month")));
         month.selectByValue(Integer.toString(birthday.get(Calendar.MONTH)));
-
-        driver.findElement(By.id("day")).sendKeys(Integer.toString(birthday.get(Calendar.DAY_OF_MONTH)));
-        driver.findElement(By.id("year")).sendKeys(Integer.toString(birthday.get(Calendar.YEAR)));
+        typeKeys(Integer.toString(birthday.get(Calendar.DAY_OF_MONTH)), randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("day")));
+        typeKeys(Integer.toString(birthday.get(Calendar.YEAR)), randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("year")));
 
         Select gender = new Select(driver.findElement(By.id("gender")));
         newGmail.setGender(randomGen.nextInt(2) + 1);
         gender.selectByValue(Integer.toString(newGmail.getGender()));
 
         newGmail.setDateOfBirth(birthday);
+    }
+
+    private void typeKeys(String input, int wordsPerMinute, WebElement element) {
+        for(int count = 0; count < input.length(); count++) {
+            element.sendKeys(Character.toString(input.charAt(count)));
+            try {
+                Thread.sleep((int) (1000 / ((double) wordsPerMinute / 60)) / 5); // divide by 5 to account for average word length
+            } 
+            catch (InterruptedException e) {
+                System.out.println("Error when trying to pause keystrokes.");
+            }
+        }
     }
 }
