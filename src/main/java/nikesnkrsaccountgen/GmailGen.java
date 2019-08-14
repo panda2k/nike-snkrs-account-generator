@@ -104,12 +104,14 @@ public class GmailGen {
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneUsageNext"))); 
         driver.findElement(By.id("phoneUsageNext")).click();
         System.out.println("Almost finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
+        
         // remove later
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
-            //TODO: handle exception
+            System.out.println("Error while pausing to check terms of service");
         }
+
         System.out.println("size of button list " + driver.findElements(By.xpath("//button[@aria-label='Scroll down']")).size());
         waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@aria-label='Scroll down']")));
         while(driver.findElements(By.xpath("//*[contains(text(), 'I agree')]")).size() == 0) {
@@ -244,11 +246,31 @@ public class GmailGen {
         Random randomGen = new Random();
         GregorianCalendar birthday = new GregorianCalendar(randomGen.nextInt(20) + 1970, randomGen.nextInt(12) + 1, randomGen.nextInt(28) + 1);
         Select month = new Select(driver.findElement(By.id("month")));
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            System.out.println("Error sleeping during account information fillout");
+        }
         month.selectByValue(Integer.toString(birthday.get(Calendar.MONTH)));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            System.out.println("Error sleeping during account information fillout");
+        }
         typeKeys(Integer.toString(birthday.get(Calendar.DAY_OF_MONTH)), randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("day")));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            System.out.println("Error sleeping during account information fillout");
+        }
         typeKeys(Integer.toString(birthday.get(Calendar.YEAR)), randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("year")));
 
         Select gender = new Select(driver.findElement(By.id("gender")));
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            System.out.println("Error sleeping during account information fillout");
+        }
         newGmail.setGender(randomGen.nextInt(2) + 1);
         gender.selectByValue(Integer.toString(newGmail.getGender()));
 
