@@ -8,7 +8,7 @@ public class Gmail {
     String password;
     String firstName;
     String lastName;
-    String gender;
+    int gender; // 1 is male, 2 is female
     GregorianCalendar dateOfBirth;
 
     public Gmail(String emailAddress, String password) {
@@ -28,11 +28,11 @@ public class Gmail {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setGender(String gender) {
+    public void setGender(int gender) {
         this.gender = gender;
     }
 
-    public Date getDateOfBirth() {
+    public GregorianCalendar getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -44,7 +44,7 @@ public class Gmail {
         return lastName;
     }
 
-    public String getGender() {
+    public int getGender() {
         return gender; 
     }
 
