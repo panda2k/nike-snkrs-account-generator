@@ -1,5 +1,6 @@
 package nikesnkrsaccountgen;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class Gmail {
@@ -33,6 +34,18 @@ public class Gmail {
 
     public GregorianCalendar getDateOfBirth() {
         return dateOfBirth;
+    }
+
+    public int getBirthMonth() {
+        return dateOfBirth.get(Calendar.MONTH);
+    }
+
+    public int getBirthYear() {
+        return dateOfBirth.get(Calendar.YEAR);
+    }
+
+    public int getBirthDay() {
+        return dateOfBirth.get(Calendar.DAY_OF_MONTH);
     }
 
     public String getFirstName() {
