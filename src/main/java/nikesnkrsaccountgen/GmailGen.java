@@ -1,12 +1,8 @@
 package nikesnkrsaccountgen;
 
 import java.util.Random;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -33,7 +29,7 @@ public class GmailGen extends AccountGenerator{
         Random randomGen = new Random();
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
-        String phoneNumber = getPhoneNumber();
+        String phoneNumber = getPhoneNumber("uk", "1");
         String firstName = getFirstName();
         String lastName = getLastName();
         String verificationMessage;
@@ -63,7 +59,7 @@ public class GmailGen extends AccountGenerator{
         driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
 
         // get the verification code for gmail account
-        verificationMessage = getMessage(phoneNumber);
+        verificationMessage = getMessage(phoneNumber, "uk", "1");
         for(int count = 2; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
             if(Character.isDigit(verificationMessage.charAt(count))) {
                 verificationCode += verificationMessage.charAt(count);
@@ -75,7 +71,7 @@ public class GmailGen extends AccountGenerator{
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("code"))); 
         typeKeys(verificationCode, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.id("code"))); 
         driver.findElement(By.id("gradsIdvVerifyNext")).click();
-        blacklistNumber(phoneNumber);
+        blacklistNumber(phoneNumber, "uk", "1");
 
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("month"))); 
         enterRandomInfo();
