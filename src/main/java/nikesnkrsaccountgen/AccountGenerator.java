@@ -16,7 +16,6 @@ import org.apache.http.util.EntityUtils;
 import org.openqa.selenium.WebElement;
 
 public class AccountGenerator {
-    final String getSMSCodeAPIURL = "http://api.getsmscode.com/vndo.php";
     final String username = "littlwang@gmail.com";
     final String token = "36d0674c163d6b68ae2ccc89e461ed1f";
 
@@ -54,15 +53,20 @@ public class AccountGenerator {
 
         return password;
     }
-    public String getPhoneNumber() {
-        String getNumberURL = getSMSCodeAPIURL + "?action=getmobile&" + "username=" + username + "&token=" + token + "&pid=1" + "&cocode=uk"; 
+    public String getPhoneNumber(String countryCode, String pid) {
+        String getNumberURL;
+        if(countryCode.equals("cn")) {
+            getNumberURL = "http://api.getsmscode.com/do.php" + "?action=getmobile" + "&username=" + username + "&token=" + token + "&pid=" + pid;
+        }
+        else {
+            getNumberURL = "http://api.getsmscode.com/vndo.php" + "?action=getmobile" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&cocode=" + countryCode; 
+        }
         String phoneNumber = "+";
         HttpPost getSMSRequest = new HttpPost(getNumberURL);
         getSMSRequest.addHeader("Accept", "application/json");
         getSMSRequest.addHeader("Content-type", "application/json");
 
         System.out.println("Now executing API request " + getSMSRequest.getRequestLine());
-
         try {
             String response = requestsClient.execute(getSMSRequest, errorHandler);
             System.out.println("response: " + response);
@@ -75,9 +79,15 @@ public class AccountGenerator {
         return phoneNumber;
     }
 
-    public String getMessage(String phoneNumber) {
+    public String getMessage(String phoneNumber, String countryCode, String pid) {
         String message = "Message|Not Receive"; 
-        String getMessageURL = getSMSCodeAPIURL + "?action=getsms&username=" + username + "&token=" + token + "&pid=1&mobile=" + phoneNumber + "&cocode=uk"; 
+        String getMessageURL; 
+        if(countryCode.equals("cn")) {
+            getMessageURL = "http://api.getsmscode.com/do.php" + "?action=getsms" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber;
+        }
+        else {
+            getMessageURL = "http://api.getsmscode.com/vndo.php" + "?action=getsms" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber + "&cocode=" + countryCode; 
+        }
         HttpPost getSMSRequest = new HttpPost(getMessageURL);
         getSMSRequest.addHeader("Accept", "application/json");
         getSMSRequest.addHeader("Content-type", "application/json");
@@ -108,8 +118,14 @@ public class AccountGenerator {
         return message;
     }
 
-    public void blacklistNumber(String phoneNumber) {
-        String blacklistNumberURL = getSMSCodeAPIURL + "?action=addblack&username=" + username + "&token=" + token + "&pid=1&mobile=" + phoneNumber + "&cocode=uk"; 
+    public void blacklistNumber(String phoneNumber, String countryCode, String pid) {
+        String blacklistNumberURL; 
+        if(countryCode.equals("cn")) {
+            blacklistNumberURL = "http://api.getsmscode.com/do.php" + "?action=addblack" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber;
+        }
+        else {
+            blacklistNumberURL = "http://api.getsmscode.com/vndo.php" + "?action=addblack" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber + "&cocode=" + countryCode; 
+        }
         HttpPost getSMSRequest = new HttpPost(blacklistNumberURL);
         getSMSRequest.addHeader("Accept", "application/json");
         getSMSRequest.addHeader("Content-type", "application/json");
