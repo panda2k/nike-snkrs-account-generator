@@ -17,7 +17,7 @@ public class GmailGen extends AccountGenerator{
     WebDriver driver;
     final int startingTypeSpeed = 75;
 
-    private Gmail newGmail;
+    private Email newGmail;
 
     public GmailGen() {
         driver = new FirefoxDriver();
@@ -29,7 +29,7 @@ public class GmailGen extends AccountGenerator{
         gmailProxy.setHttpProxy(proxy);
     }
 
-    public Gmail generateGmail() {
+    public Email generateGmail() {
         Random randomGen = new Random();
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
@@ -54,7 +54,7 @@ public class GmailGen extends AccountGenerator{
             driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
         } while(driver.findElements(By.xpath("//*[contains(text(), 'That username is taken. Try another.')]")).size() != 0);
         
-        newGmail = new Gmail(firstName + lastName.charAt(0) + emailEnding + "@gmail.com", password);
+        newGmail = new Email(firstName + lastName.charAt(0) + emailEnding + "@gmail.com", password);
         newGmail.setFirstName(getFirstName());
         newGmail.setLastName(getLastName());
 
@@ -100,56 +100,6 @@ public class GmailGen extends AccountGenerator{
         driver.findElement(By.xpath("//*[contains(text(), 'I agree')]")).click();
         System.out.println("Finished created google account.\nEmail is " + newGmail.getEmailAddress() + "\nPassword is: " + newGmail.getPassword());
         return newGmail;
-    }
-    
-    private String randomNumberString(int digits) {
-        Random randomGen = new Random();
-        String randomNumbers = "";
-
-        for(int count = 0; count < digits; count++) {
-            randomNumbers += randomGen.nextInt(10);
-        }
-
-        return randomNumbers;
-    }
-
-    private String getFirstName() {
-        String firstName;
-        ArrayList<String> firstNames = new ArrayList<String>();
-        File firstNameList = new File("C:\\Users\\Michael Wang\\Programming\\nike-snkrs-account-generator\\resources\\first-names.txt");
-        Random randomGen = new Random();
-
-        try {
-            Scanner sc = new Scanner(firstNameList);
-            while(sc.hasNextLine()) {
-                firstNames.add(sc.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("First name list not found");
-        }
-
-        firstName = firstNames.get(randomGen.nextInt(firstNames.size()));
-        return firstName;
-    }
-
-    private String getLastName() {
-        String lastName;
-        ArrayList<String> lastNames = new ArrayList<String>();
-        File lastNameList = new File("C:\\Users\\Michael Wang\\Programming\\nike-snkrs-account-generator\\resources\\last-names.txt");
-        Random randomGen = new Random();
-
-        try {
-            Scanner sc = new Scanner(lastNameList);
-            while(sc.hasNextLine()) {
-                lastNames.add(sc.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Last name list not found");
-        }
-
-        lastName = lastNames.get(randomGen.nextInt(lastNames.size()));
-        
-        return lastName;
     }
 
     private void enterRandomInfo() {
