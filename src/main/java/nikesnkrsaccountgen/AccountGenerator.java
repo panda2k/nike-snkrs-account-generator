@@ -1,7 +1,11 @@
 package nikesnkrsaccountgen;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -15,7 +19,7 @@ public class AccountGenerator {
     final String getSMSCodeAPIURL = "http://api.getsmscode.com/vndo.php";
     final String username = "littlwang@gmail.com";
     final String token = "36d0674c163d6b68ae2ccc89e461ed1f";
-    
+
     CloseableHttpClient requestsClient = HttpClients.createDefault();
     ResponseHandler errorHandler = new ResponseHandler<String>() {
         public String handleResponse(HttpResponse response) throws IOException{
@@ -120,4 +124,51 @@ public class AccountGenerator {
         }
     }
 
+    public String randomNumberString(int digits) {
+        Random randomGen = new Random();
+        String randomNumbers = "";
+
+        for(int count = 0; count < digits; count++) {
+            randomNumbers += randomGen.nextInt(10);
+        }
+
+        return randomNumbers;
+    }
+    public String getFirstName() {
+        String firstName;
+        ArrayList<String> firstNames = new ArrayList<String>();
+        File firstNameList = new File("C:\\Users\\Michael Wang\\Programming\\nike-snkrs-account-generator\\resources\\first-names.txt");
+        Random randomGen = new Random();
+
+        try {
+            Scanner sc = new Scanner(firstNameList);
+            while(sc.hasNextLine()) {
+                firstNames.add(sc.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("First name list not found");
+        }
+
+        firstName = firstNames.get(randomGen.nextInt(firstNames.size()));
+        return firstName;
+    }
+    public String getLastName() {
+        String lastName;
+        ArrayList<String> lastNames = new ArrayList<String>();
+        File lastNameList = new File("C:\\Users\\Michael Wang\\Programming\\nike-snkrs-account-generator\\resources\\last-names.txt");
+        Random randomGen = new Random();
+
+        try {
+            Scanner sc = new Scanner(lastNameList);
+            while(sc.hasNextLine()) {
+                lastNames.add(sc.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Last name list not found");
+        }
+
+        lastName = lastNames.get(randomGen.nextInt(lastNames.size()));
+        
+        return lastName;
+    }
 }
