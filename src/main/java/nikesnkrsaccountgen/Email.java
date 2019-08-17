@@ -3,7 +3,7 @@ package nikesnkrsaccountgen;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class Gmail {
+public class Email {
     String emailAddress;
     String password;
     String firstName;
@@ -11,7 +11,7 @@ public class Gmail {
     int gender; // 1 is male, 2 is female
     GregorianCalendar dateOfBirth;
 
-    public Gmail(String emailAddress, String password) {
+    public Email(String emailAddress, String password) {
         this.emailAddress = emailAddress;
         this.password = password;
     }
@@ -36,16 +36,26 @@ public class Gmail {
         return dateOfBirth;
     }
 
-    public int getBirthMonth() {
-        return dateOfBirth.get(Calendar.MONTH);
+    public String getBirthMonth() {
+        if(dateOfBirth.get(Calendar.MONTH) < 10) {
+            return "0" + dateOfBirth.get(Calendar.MONTH);
+        }
+        else {
+            return Integer.toString(dateOfBirth.get(Calendar.MONTH));
+        }
     }
 
-    public int getBirthYear() {
-        return dateOfBirth.get(Calendar.YEAR);
+    public String getBirthYear() {
+        return Integer.toString(dateOfBirth.get(Calendar.YEAR));
     }
 
-    public int getBirthDay() {
-        return dateOfBirth.get(Calendar.DAY_OF_MONTH);
+    public String getBirthDay() {
+        if(dateOfBirth.get(Calendar.MONTH) < 10) {
+            return "0" + dateOfBirth.get(Calendar.DAY_OF_MONTH);
+        }
+        else {
+            return Integer.toString(dateOfBirth.get(Calendar.MONTH));
+        }
     }
 
     public String getFirstName() {
