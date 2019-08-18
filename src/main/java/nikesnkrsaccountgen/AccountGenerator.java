@@ -80,7 +80,7 @@ public class AccountGenerator {
     }
 
     public String getMessage(String phoneNumber, String countryCode, String pid) {
-        String message = "Message|Not Receive"; 
+        String message = "Message|not receive"; 
         String getMessageURL; 
         if(countryCode.equals("cn")) {
             getMessageURL = "http://api.getsmscode.com/do.php" + "?action=getsms" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber;
@@ -103,7 +103,7 @@ public class AccountGenerator {
                 System.out.println("IOException. Please check URL parameters");
             }
     
-            if(message.equals("Message|Not Receive") == true) {
+            if(message.equals("Message|not receive") == true) {
                 try {
                     Thread.sleep(10000);
                     System.out.println("No message recieved, sleeping for 10 seconds");                    
@@ -113,7 +113,7 @@ public class AccountGenerator {
                 }
             }
             
-        } while(message.equals("Message|Not Receive") == true);
+        } while(message.equals("Message|not receive") == true);
         System.out.println("Receieved message\nMessage:'" + message + "'");
         return message;
     }
