@@ -77,4 +77,8 @@ public class Email {
     public String getPassword() {
         return password;
     }
+
+    public String toString() {
+        return emailAddress + ":" + password;
+    }
 }

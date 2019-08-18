@@ -48,7 +48,7 @@ public class AccountGenerator {
         Random randomGen = new Random();
 
         for(int count = 0; count < characterCount; count++) {
-            password += (char) randomGen.nextInt(75) + 48;
+            password += (char) (randomGen.nextInt(75) + 48);
         }
 
         return password;
