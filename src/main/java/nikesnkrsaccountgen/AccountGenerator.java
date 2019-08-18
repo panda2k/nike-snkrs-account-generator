@@ -80,6 +80,7 @@ public class AccountGenerator {
     }
 
     public String getMessage(String phoneNumber, String countryCode, String pid) {
+        int refreshCount = 0;
         String message = "Message|not receive"; 
         String getMessageURL; 
         if(countryCode.equals("cn")) {
@@ -105,8 +106,12 @@ public class AccountGenerator {
     
             if(message.equals("Message|not receive") == true) {
                 try {
+                    if(refreshCount >= 6) {
+                        return "no message recieved";
+                    }
                     Thread.sleep(10000);
-                    System.out.println("No message recieved, sleeping for 10 seconds");                    
+                    System.out.println("No message recieved, sleeping for 10 seconds");
+                    refreshCount++;                    
                 } 
                 catch (InterruptedException e) {
                     System.out.println("Unable to pause thread");
