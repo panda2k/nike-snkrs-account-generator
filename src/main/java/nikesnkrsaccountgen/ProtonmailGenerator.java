@@ -1,6 +1,8 @@
 package nikesnkrsaccountgen;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.Random;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -48,7 +50,7 @@ public class ProtonmailGenerator extends AccountGenerator{
         try {
             Thread.sleep(1500);
         } catch (Exception e) {
-            //TODO: handle exception
+            System.out.println("Caught exception while sleeping");
         }
 
         if(driver.getPageSource().contains("Username already used")) {
@@ -89,6 +91,10 @@ public class ProtonmailGenerator extends AccountGenerator{
         driver.findElement(By.xpath("//button[@type='submit']")).click();
 
         newEmail = new Email(emailAddress, password);
+        newEmail.setFirstName(firstName);
+        newEmail.setLastName(lastName);
+        fillEmailProfile(newEmail);
+
         return newEmail;
     }
 
@@ -104,5 +110,12 @@ public class ProtonmailGenerator extends AccountGenerator{
                 System.out.println("Error when trying to pause keystrokes.");
             }
         }
+    }
+
+    private void fillEmailProfile(Email newEmail) {
+        Random randomGen = new Random();
+
+        newEmail.setGender(randomGen.nextInt(2) + 1);
+        newEmail.setDateOfBirth(new GregorianCalendar(randomGen.nextInt(20) + 1970, randomGen.nextInt(12) + 1, randomGen.nextInt(28) + 1));
     }
 }
