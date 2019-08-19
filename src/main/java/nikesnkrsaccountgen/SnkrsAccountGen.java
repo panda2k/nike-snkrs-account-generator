@@ -19,6 +19,7 @@ public class SnkrsAccountGen extends AccountGenerator{
 
     public void generateAccount() {
         WebDriverWait waiter = new WebDriverWait(driver, 20);
+        String phoneNumber = getPhoneNumber(uk, pid)
 
         do {
             driver.get("https://nike.com");
@@ -26,7 +27,8 @@ public class SnkrsAccountGen extends AccountGenerator{
             driver.findElement(By.id("AccountNavigationContainer")).click();
             driver.findElement(By.linkText("Join now.")).click();
             if(driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0) {
-                driver.navigate().refresh();
+                driver.quit();
+                driver = new FirefoxDriver();
             }
         } while (driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0);
 
@@ -42,7 +44,9 @@ public class SnkrsAccountGen extends AccountGenerator{
     private void fillSignupForm() {
         typeKeys(accountInfo.getEmailAddress(), 75, driver.findElement(By.name("emailAddress")));
         typeKeys(accountInfo.getPassword(), 75, driver.findElement(By.name("password")));
-        
+        typeKeys(accountInfo.getFirstName(), 75, driver.findElement(By.name("firstName")));
+        typeKeys(accountInfo.getLastName(), 75, driver.findElement(By.name("lastName")));
+
         Select birthMonth = new Select(driver.findElement(By.id("nike-unite-date-id-mm")));
         birthMonth.selectByValue(accountInfo.getBirthMonth());
         Select birthDay = new Select(driver.findElement(By.id("nike-unite-date-id-dd")));
@@ -51,6 +55,13 @@ public class SnkrsAccountGen extends AccountGenerator{
         birthYear.selectByValue(accountInfo.getBirthYear());
         Select country = new Select(driver.findElement(By.name("country")));
         country.selectByValue("GB");
+
+        if(accountInfo.getGender() == 1) {
+            driver.findElement(By.xpath("//span[contains(text(),'Male')]")).click();
+        }
+        else {
+            driver.findElement(By.xpath("//span[contains(text(),'Female')]")).click();
+        }
 
         /*
         if(accountInfo.getGender() == 1) {
