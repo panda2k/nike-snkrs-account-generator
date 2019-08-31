@@ -17,9 +17,8 @@ public class SnkrsAccountGen extends AccountGenerator{
         driver = new FirefoxDriver();
     }
 
-    public void generateAccount() {
+    public Email generateAccount(String countryCode) {
         WebDriverWait waiter = new WebDriverWait(driver, 20);
-        String phoneNumber = getPhoneNumber(uk, pid)
 
         do {
             driver.get("https://nike.com");
@@ -27,19 +26,103 @@ public class SnkrsAccountGen extends AccountGenerator{
             driver.findElement(By.id("AccountNavigationContainer")).click();
             driver.findElement(By.linkText("Join now.")).click();
             if(driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0) {
-                driver.quit();
+                driver.close();
                 driver = new FirefoxDriver();
             }
         } while (driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0);
 
         fillSignupForm();
         driver.findElement(By.xpath("//input[@value = 'CREATE ACCOUNT']")).click();
+
+        verifyPhoneNumber(countryCode);
+        
+        return accountInfo;
     }
 
     public String[] getAccountInfo() {
         String[] accountDetails = new String[]{accountInfo.getEmailAddress(), accountInfo.getPassword()};
         return accountDetails;
     } 
+
+    private void verifyPhoneNumber(String countryCode) {
+        WebDriverWait waiter = new WebDriverWait(driver, 20);
+
+        String verificationCode = "";
+        String verificationMessage;
+
+
+        if(countryCode.equals("cn") == false) {
+            String phoneNumber = getPhoneNumber(countryCode, "462");
+            System.out.println("Got phone number: " + phoneNumber);
+            
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                System.out.println("Caught exception while waiting for setting refresh");
+            }
+            
+            driver.get("https://www.nike.com/member/settings");
+            driver.findElement(By.xpath("//button[@aria-label='Add Mobile Number']")).click();
+            Select phoneNumberRegion = new Select(driver.findElement(By.className("country")));
+            phoneNumberRegion.selectByValue("GB");
+            typeKeys(phoneNumber.substring(3), 75, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
+            driver.findElement(By.className("sendCodeButton")).click();
+            verificationMessage = getMessage(phoneNumber, countryCode, "462");
+
+            if(verificationMessage.equals("no message recieved")) {
+                System.out.println("No message recieved. Retrying");
+                verifyPhoneNumber(countryCode);
+            }
+            else {
+                for(int count = 1; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
+                    if(Character.isDigit(verificationMessage.charAt(count))) {
+                        verificationCode += verificationMessage.charAt(count);
+                    }
+                }
+                System.out.println("Verification code is: " + verificationCode);
+            }
+
+            typeKeys(verificationCode, 75, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            driver.findElement(By.id("progressiveMobile")).click();
+            driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();
+
+            blacklistNumber(phoneNumber, countryCode, "462");
+        }
+        else {
+            String phoneNumber = getPhoneNumber(countryCode, "628");
+            System.out.println("Got phone number: " + phoneNumber);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                System.out.println("Caught exception while waiting for setting refresh");
+            }
+            driver.get("https://www.nike.com/cn/member/settings");
+            waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'添加')]")));
+            driver.findElement(By.xpath("//button[contains(text(),'添加')]")).click();
+            typeKeys(phoneNumber.substring(3), 75, driver.findElement(By.xpath("//input[@data-componentname='phoneNumber']")));
+            driver.findElement(By.className("sendCodeButton")).click();
+
+            verificationMessage = getMessage(phoneNumber.substring(1), countryCode, "628");
+            if(verificationMessage.equals("no message recieved")) {
+                System.out.println("No message recieved. Retrying");
+                verifyPhoneNumber(countryCode);
+                return;
+            }
+            else {
+                for(int count = 1; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
+                    if(Character.isDigit(verificationMessage.charAt(count))) {
+                        verificationCode += verificationMessage.charAt(count);
+                    }
+                }
+                System.out.println("Verification code is: " + verificationCode);
+            }
+
+            typeKeys(verificationCode, 75, driver.findElement(By.xpath("//input[@placeholder='输入验证码']")));
+            driver.findElement(By.xpath("//input[@value='继续']")).click();
+            blacklistNumber(phoneNumber, countryCode, "628");
+        }
+        
+    }
 
     private void fillSignupForm() {
         typeKeys(accountInfo.getEmailAddress(), 75, driver.findElement(By.name("emailAddress")));
@@ -62,20 +145,12 @@ public class SnkrsAccountGen extends AccountGenerator{
         else {
             driver.findElement(By.xpath("//span[contains(text(),'Female')]")).click();
         }
-
-        /*
-        if(accountInfo.getGender() == 1) {
-            driver.findElement(By.xpath("//button[contains(text(),'Male')]")).click();
-        }
-        else {
-            driver.findElement(By.xpath("//button[contains(text(),'Female')]")).click();
-        }
-        */
+        
         try {
             driver.findElement(By.name("receiveEmail")).click();
         } catch (ElementNotInteractableException e) {
             System.out.println("Can't interact with element, ignorable");
         }
-
+        
     }
 }
