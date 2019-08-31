@@ -104,7 +104,7 @@ public class AccountGenerator {
                 System.out.println("IOException. Please check URL parameters");
             }
     
-            if(message.equals("Message|not receive") == true) {
+            if(message.equals("Message|Not Receive") == true) {
                 try {
                     if(refreshCount >= 6) {
                         return "no message recieved";
@@ -118,7 +118,7 @@ public class AccountGenerator {
                 }
             }
             
-        } while(message.equals("Message|not receive") == true);
+        } while(message.equals("Message|Not Receive") == true);
         System.out.println("Receieved message\nMessage:'" + message + "'");
         return message;
     }
