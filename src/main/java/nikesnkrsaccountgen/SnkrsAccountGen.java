@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SnkrsAccountGen extends AccountGenerator{
     WebDriver driver;
+    private final int typingSpeed = 100;
 
     public SnkrsAccountGen(WebDriver driver) {
         this.driver = driver;
@@ -57,7 +58,7 @@ public class SnkrsAccountGen extends AccountGenerator{
             driver.findElement(By.xpath("//button[@aria-label='Add Mobile Number']")).click();
             Select phoneNumberRegion = new Select(driver.findElement(By.className("country")));
             phoneNumberRegion.selectByValue("GB");
-            typeKeys(phoneNumber.substring(3), 75, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
+            typeKeys(phoneNumber.substring(3), typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
             driver.findElement(By.className("sendCodeButton")).click();
             verificationMessage = getMessage(phoneNumber, countryCode, "462");
 
@@ -74,7 +75,7 @@ public class SnkrsAccountGen extends AccountGenerator{
                 System.out.println("Verification code is: " + verificationCode);
             }
 
-            typeKeys(verificationCode, 75, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
             driver.findElement(By.id("progressiveMobile")).click();
             driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();
 
@@ -91,7 +92,7 @@ public class SnkrsAccountGen extends AccountGenerator{
             driver.get("https://www.nike.com/cn/member/settings");
             waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'添加')]")));
             driver.findElement(By.xpath("//button[contains(text(),'添加')]")).click();
-            typeKeys(phoneNumber.substring(3), 75, driver.findElement(By.xpath("//input[@data-componentname='phoneNumber']")));
+            typeKeys(phoneNumber.substring(3), typingSpeed, driver.findElement(By.xpath("//input[@data-componentname='phoneNumber']")));
             driver.findElement(By.className("sendCodeButton")).click();
 
             verificationMessage = getMessage(phoneNumber.substring(1), countryCode, "628");
@@ -109,7 +110,7 @@ public class SnkrsAccountGen extends AccountGenerator{
                 System.out.println("Verification code is: " + verificationCode);
             }
 
-            typeKeys(verificationCode, 75, driver.findElement(By.xpath("//input[@placeholder='输入验证码']")));
+            typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='输入验证码']")));
             driver.findElement(By.xpath("//input[@value='继续']")).click();
             blacklistNumber(phoneNumber, countryCode, "628");
         }
@@ -117,14 +118,15 @@ public class SnkrsAccountGen extends AccountGenerator{
     }
 
     private void fillSignupForm(Email accountInfo) {
-        typeKeys(accountInfo.getEmailAddress(), 75, driver.findElement(By.name("emailAddress")));
-        typeKeys(accountInfo.getPassword(), 75, driver.findElement(By.name("password")));
-        typeKeys(accountInfo.getFirstName(), 75, driver.findElement(By.name("firstName")));
-        typeKeys(accountInfo.getLastName(), 75, driver.findElement(By.name("lastName")));
+        typeKeys(accountInfo.getEmailAddress(), typingSpeed, driver.findElement(By.name("emailAddress")));
+        typeKeys(accountInfo.getPassword(), typingSpeed, driver.findElement(By.name("password")));
+        typeKeys(accountInfo.getFirstName(), typingSpeed, driver.findElement(By.name("firstName")));
+        typeKeys(accountInfo.getLastName(), typingSpeed, driver.findElement(By.name("lastName")));
 
         Select birthMonth = new Select(driver.findElement(By.id("nike-unite-date-id-mm")));
         birthMonth.selectByValue(accountInfo.getBirthMonth());
         Select birthDay = new Select(driver.findElement(By.id("nike-unite-date-id-dd")));
+        System.out.println("birth day: " + accountInfo.getBirthDay());
         birthDay.selectByValue(accountInfo.getBirthDay());
         Select birthYear = new Select(driver.findElement(By.id("nike-unite-date-id-yyyy")));
         birthYear.selectByValue(accountInfo.getBirthYear());
