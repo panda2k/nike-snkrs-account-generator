@@ -49,7 +49,15 @@ public class AccountGenerator {
 
         for(int count = 0; count < characterCount; count++) {
             password += (char) (randomGen.nextInt(75) + 48);
+            if(password.charAt(count) == ';') {
+                password = password.substring(0, count + 1);
+                count--;
+            }
         }
+
+        password += (char) (randomGen.nextInt(27) + 98); // make sure password has a lowercase letter
+        password += (char) (randomGen.nextInt(27) + 65); // make sure password has an uppercase letter
+        password += (char) (randomGen.nextInt(15) + 33); // make sure password has a symbol 
 
         return password;
     }
@@ -81,8 +89,16 @@ public class AccountGenerator {
 
     public String getMessage(String phoneNumber, String countryCode, String pid) {
         int refreshCount = 0;
-        String message = "Message|not receive"; 
         String getMessageURL; 
+        String defaultMessage;
+        if(countryCode.equals("cn")) {
+            defaultMessage = "Message|not receive";
+        }
+        else {
+            defaultMessage = "Message|Not Receive";
+        }
+        String message = defaultMessage; 
+
         if(countryCode.equals("cn")) {
             getMessageURL = "http://api.getsmscode.com/do.php" + "?action=getsms" + "&username=" + username + "&token=" + token + "&pid=" + pid + "&mobile=" + phoneNumber;
         }
@@ -104,7 +120,7 @@ public class AccountGenerator {
                 System.out.println("IOException. Please check URL parameters");
             }
     
-            if(message.equals("Message|Not Receive") == true) {
+            if(message.equals(defaultMessage)) {
                 try {
                     if(refreshCount >= 6) {
                         return "no message recieved";
@@ -118,7 +134,7 @@ public class AccountGenerator {
                 }
             }
             
-        } while(message.equals("Message|Not Receive") == true);
+        } while(message.equals(defaultMessage));
         System.out.println("Receieved message\nMessage:'" + message + "'");
         return message;
     }
