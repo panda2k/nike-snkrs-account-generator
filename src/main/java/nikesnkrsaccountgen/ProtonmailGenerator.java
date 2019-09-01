@@ -1,6 +1,5 @@
 package nikesnkrsaccountgen;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
@@ -15,8 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class ProtonmailGenerator extends AccountGenerator{
     WebDriver driver;
 
-    public ProtonmailGenerator() {
-        driver = new FirefoxDriver();
+    public ProtonmailGenerator(WebDriver driver) {
+        this.driver = driver;
     }
 
     public Email generateAccount() {
@@ -87,13 +86,18 @@ public class ProtonmailGenerator extends AccountGenerator{
         }
 
         System.out.println("code is: " + verificationCode);
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("codeValue")));
         driver.findElement(By.id("codeValue")).sendKeys(verificationCode);
         driver.findElement(By.xpath("//button[@type='submit']")).click();
+
+        emailAddress += "@protonmail.com";
 
         newEmail = new Email(emailAddress, password);
         newEmail.setFirstName(firstName);
         newEmail.setLastName(lastName);
         fillEmailProfile(newEmail);
+
+        waiter.until(ExpectedConditions.elementToBeClickable(By.id("displayName")));
 
         return newEmail;
     }

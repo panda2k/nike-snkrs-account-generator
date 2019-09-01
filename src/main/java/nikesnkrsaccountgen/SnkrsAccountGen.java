@@ -9,15 +9,13 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SnkrsAccountGen extends AccountGenerator{
-    Email accountInfo;
     WebDriver driver;
 
-    public SnkrsAccountGen(Email accountInfo) {
-        this.accountInfo = accountInfo;
-        driver = new FirefoxDriver();
+    public SnkrsAccountGen(WebDriver driver) {
+        this.driver = driver;
     }
 
-    public Email generateAccount(String countryCode) {
+    public Email generateAccount(String countryCode, Email accountInfo) {
         WebDriverWait waiter = new WebDriverWait(driver, 20);
 
         do {
@@ -26,23 +24,17 @@ public class SnkrsAccountGen extends AccountGenerator{
             driver.findElement(By.id("AccountNavigationContainer")).click();
             driver.findElement(By.linkText("Join now.")).click();
             if(driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0) {
-                driver.close();
-                driver = new FirefoxDriver();
+                return new SnkrsAccountGen(new FirefoxDriver()).generateAccount(countryCode, accountInfo);
             }
         } while (driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0);
 
-        fillSignupForm();
+        fillSignupForm(accountInfo);
         driver.findElement(By.xpath("//input[@value = 'CREATE ACCOUNT']")).click();
 
         verifyPhoneNumber(countryCode);
         
         return accountInfo;
     }
-
-    public String[] getAccountInfo() {
-        String[] accountDetails = new String[]{accountInfo.getEmailAddress(), accountInfo.getPassword()};
-        return accountDetails;
-    } 
 
     private void verifyPhoneNumber(String countryCode) {
         WebDriverWait waiter = new WebDriverWait(driver, 20);
@@ -124,7 +116,7 @@ public class SnkrsAccountGen extends AccountGenerator{
         
     }
 
-    private void fillSignupForm() {
+    private void fillSignupForm(Email accountInfo) {
         typeKeys(accountInfo.getEmailAddress(), 75, driver.findElement(By.name("emailAddress")));
         typeKeys(accountInfo.getPassword(), 75, driver.findElement(By.name("password")));
         typeKeys(accountInfo.getFirstName(), 75, driver.findElement(By.name("firstName")));
