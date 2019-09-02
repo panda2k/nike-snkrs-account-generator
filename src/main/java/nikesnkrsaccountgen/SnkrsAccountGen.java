@@ -1,7 +1,10 @@
 package nikesnkrsaccountgen;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -20,12 +23,14 @@ public class SnkrsAccountGen extends AccountGenerator{
         WebDriverWait waiter = new WebDriverWait(driver, 20);
 
         do {
-            driver.get("https://nike.com");
-            waiter.until(ExpectedConditions.elementToBeClickable(By.id("AccountNavigationContainer")));
-            driver.findElement(By.id("AccountNavigationContainer")).click();
+            driver.get("https://www.nike.com/login");
+            waiter.until(ExpectedConditions.elementToBeClickable(By.linkText("Join now.")));
             driver.findElement(By.linkText("Join now.")).click();
             if(driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0) {
-                return new SnkrsAccountGen(new FirefoxDriver()).generateAccount(countryCode, accountInfo);
+                WebDriver driver2 = new FirefoxDriver();
+                Email createdAccount = new SnkrsAccountGen(driver2).generateAccount(countryCode, accountInfo);
+                driver2.quit();
+                return createdAccount;
             }
         } while (driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0);
 
@@ -44,44 +49,7 @@ public class SnkrsAccountGen extends AccountGenerator{
         String verificationMessage;
 
 
-        if(countryCode.equals("cn") == false) {
-            String phoneNumber = getPhoneNumber(countryCode, "462");
-            System.out.println("Got phone number: " + phoneNumber);
-            
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                System.out.println("Caught exception while waiting for setting refresh");
-            }
-            
-            driver.get("https://www.nike.com/member/settings");
-            driver.findElement(By.xpath("//button[@aria-label='Add Mobile Number']")).click();
-            Select phoneNumberRegion = new Select(driver.findElement(By.className("country")));
-            phoneNumberRegion.selectByValue("GB");
-            typeKeys(phoneNumber.substring(3), typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
-            driver.findElement(By.className("sendCodeButton")).click();
-            verificationMessage = getMessage(phoneNumber, countryCode, "462");
-
-            if(verificationMessage.equals("no message recieved")) {
-                System.out.println("No message recieved. Retrying");
-                verifyPhoneNumber(countryCode);
-            }
-            else {
-                for(int count = 1; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
-                    if(Character.isDigit(verificationMessage.charAt(count))) {
-                        verificationCode += verificationMessage.charAt(count);
-                    }
-                }
-                System.out.println("Verification code is: " + verificationCode);
-            }
-
-            typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
-            driver.findElement(By.id("progressiveMobile")).click();
-            driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();
-
-            blacklistNumber(phoneNumber, countryCode, "462");
-        }
-        else {
+        if(countryCode.equals("cn")) {
             String phoneNumber = getPhoneNumber(countryCode, "628");
             System.out.println("Got phone number: " + phoneNumber);
             try {
@@ -113,6 +81,57 @@ public class SnkrsAccountGen extends AccountGenerator{
             typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='输入验证码']")));
             driver.findElement(By.xpath("//input[@value='继续']")).click();
             blacklistNumber(phoneNumber, countryCode, "628");
+        }
+        else {
+            String phoneNumber = getPhoneNumber(countryCode, "462");
+            System.out.println("Got phone number: " + phoneNumber);
+            
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                System.out.println("Caught exception while waiting for setting refresh");
+            }
+            
+            driver.get("https://www.nike.com/member/settings");
+            driver.findElement(By.xpath("//button[@aria-label='Add Mobile Number']")).click();
+            Select phoneNumberRegion = new Select(driver.findElement(By.className("country")));
+            try {
+                phoneNumberRegion.selectByValue("GB");
+            } catch (ElementClickInterceptedException e) {
+                System.out.println("Caught exception when selecting country. Retrying");
+                try {
+                    Thread.sleep(2500);
+                    phoneNumberRegion.selectByValue("GB");
+                } catch (InterruptedException f) {
+                    System.out.println("Caught error while sleeping.");
+                }
+            }
+            typeKeys(phoneNumber.substring(3), typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
+            driver.findElement(By.id("progressiveMobile")).click();
+            driver.findElement(By.className("sendCodeButton")).click();
+            verificationMessage = getMessage(phoneNumber, countryCode, "462");
+
+            if(verificationMessage.equals("no message recieved")) {
+                System.out.println("No message recieved. Retrying");
+                verifyPhoneNumber(countryCode);
+            }
+            else {
+                for(int count = 1; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
+                    if(Character.isDigit(verificationMessage.charAt(count))) {
+                        verificationCode += verificationMessage.charAt(count);
+                    }
+                }
+                System.out.println("Verification code is: " + verificationCode);
+            }
+
+            typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            try {
+                driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();
+            } catch (NoSuchElementException e) {
+                System.out.println("Caught exception while clicking continue. Account still should be verified");
+            }
+
+            blacklistNumber(phoneNumber, countryCode, "462");
         }
         
     }
