@@ -58,6 +58,7 @@ public class AccountGenerator {
         password += (char) (randomGen.nextInt(27) + 98); // make sure password has a lowercase letter
         password += (char) (randomGen.nextInt(27) + 65); // make sure password has an uppercase letter
         password += (char) (randomGen.nextInt(15) + 33); // make sure password has a symbol 
+        password += (char) (randomGen.nextInt(10) + 48); // make sure password has a number
 
         return password;
     }
@@ -125,9 +126,9 @@ public class AccountGenerator {
                     if(refreshCount >= 6) {
                         return "no message recieved";
                     }
-                    Thread.sleep(10000);
                     System.out.println("No message recieved, sleeping for 10 seconds");
-                    refreshCount++;                    
+                    Thread.sleep(10000);
+                    refreshCount++;
                 } 
                 catch (InterruptedException e) {
                     System.out.println("Unable to pause thread");

@@ -38,7 +38,7 @@ public class Email {
 
     public String getBirthMonth() {
         if(dateOfBirth.get(Calendar.MONTH) < 10) {
-            return "0" + Integer.toString(dateOfBirth.get(Calendar.MONTH));
+            return "0" + dateOfBirth.get(Calendar.MONTH);
         }
         else {
             return Integer.toString(dateOfBirth.get(Calendar.MONTH));
@@ -51,7 +51,7 @@ public class Email {
 
     public String getBirthDay() {
         if(dateOfBirth.get(Calendar.MONTH) < 10) {
-            return "0" + Integer.toString(dateOfBirth.get(Calendar.DAY_OF_MONTH));
+            return "0" + dateOfBirth.get(Calendar.DAY_OF_MONTH);
         }
         else {
             return Integer.toString(dateOfBirth.get(Calendar.MONTH));

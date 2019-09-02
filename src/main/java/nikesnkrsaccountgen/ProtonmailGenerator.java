@@ -47,7 +47,7 @@ public class ProtonmailGenerator extends AccountGenerator{
         typeUsername.perform();
         browserTypeKeys(builder, emailAddress, 75);
         try {
-            Thread.sleep(1500);
+            Thread.sleep(3500);
         } catch (Exception e) {
             System.out.println("Caught exception while sleeping");
         }
