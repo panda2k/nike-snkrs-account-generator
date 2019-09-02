@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -52,11 +53,6 @@ public class ProtonmailGenerator extends AccountGenerator{
             System.out.println("Caught exception while sleeping");
         }
 
-        if(driver.getPageSource().contains("Username already used")) {
-            Actions fixEmail = builder.sendKeys(Keys.BACK_SPACE);
-            fixEmail.perform();
-        }
-
         typeKeys(password, 75, driver.findElement(By.id("password")));
         typeKeys(password, 75, driver.findElement(By.id("passwordc")));
         
@@ -69,7 +65,12 @@ public class ProtonmailGenerator extends AccountGenerator{
         Keys.chord(Keys.ENTER));
         enterAccount.perform();
 
-        waiter.until(ExpectedConditions.elementToBeClickable(By.id("confirmModalBtn")));
+        try {
+            waiter.until(ExpectedConditions.elementToBeClickable(By.id("confirmModalBtn")));
+        } catch (TimeoutException e) {
+            System.out.println("Retrying protonmail signup");
+            return generateAccount();
+        }
         driver.findElement(By.id("confirmModalBtn")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='humanVerification-block-sms']//label[@class='signup-radio-label']"))).click();
         typeKeys(phoneNumber, 75, driver.findElement(By.id("smsVerification")));
@@ -77,7 +78,7 @@ public class ProtonmailGenerator extends AccountGenerator{
 
         verificationMessage = getMessage(phoneNumber.substring(1), "cn", "404");
         if(verificationMessage.equals("no message recieved")) {
-            generateAccount();
+            return generateAccount();
         }
         for(int count = 1; count < verificationMessage.length(); count++) { // start count at 2 to get out of starting message
             if(Character.isDigit(verificationMessage.charAt(count))) {

@@ -50,11 +50,11 @@ public class Email {
     }
 
     public String getBirthDay() {
-        if(dateOfBirth.get(Calendar.MONTH) < 10) {
+        if(dateOfBirth.get(Calendar.DAY_OF_MONTH) < 10) {
             return "0" + dateOfBirth.get(Calendar.DAY_OF_MONTH);
         }
         else {
-            return Integer.toString(dateOfBirth.get(Calendar.MONTH));
+            return Integer.toString(dateOfBirth.get(Calendar.DAY_OF_MONTH));
         }
     }
 
