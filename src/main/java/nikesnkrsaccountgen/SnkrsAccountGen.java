@@ -4,7 +4,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,7 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SnkrsAccountGen extends AccountGenerator{
     WebDriver driver;
-    private final int typingSpeed = 100;
+    private final int typingSpeed = 75;
 
     public SnkrsAccountGen(WebDriver driver) {
         this.driver = driver;
@@ -35,8 +34,8 @@ public class SnkrsAccountGen extends AccountGenerator{
         } while (driver.findElements(By.id("nike-unite-date-id-yyyy")).size() == 0);
 
         fillSignupForm(accountInfo);
+        
         driver.findElement(By.xpath("//input[@value = 'CREATE ACCOUNT']")).click();
-
         verifyPhoneNumber(countryCode);
         
         return accountInfo;
@@ -85,7 +84,7 @@ public class SnkrsAccountGen extends AccountGenerator{
         else {
             String phoneNumber = getPhoneNumber(countryCode, "462");
             System.out.println("Got phone number: " + phoneNumber);
-            
+
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -93,9 +92,16 @@ public class SnkrsAccountGen extends AccountGenerator{
             }
             
             driver.get("https://www.nike.com/member/settings");
+            waiter.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@aria-label='Add Mobile Number']")));
             driver.findElement(By.xpath("//button[@aria-label='Add Mobile Number']")).click();
+            
             Select phoneNumberRegion = new Select(driver.findElement(By.className("country")));
             try {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    System.out.println("Caught exception while sleeping");
+                }
                 phoneNumberRegion.selectByValue("GB");
             } catch (ElementClickInterceptedException e) {
                 System.out.println("Caught exception when selecting country. Retrying");
@@ -106,13 +112,18 @@ public class SnkrsAccountGen extends AccountGenerator{
                     System.out.println("Caught error while sleeping.");
                 }
             }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                System.out.println("Caught exception while sleeping");
+            }
             typeKeys(phoneNumber.substring(3), typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Mobile Number']")));
-            driver.findElement(By.id("progressiveMobile")).click();
             driver.findElement(By.className("sendCodeButton")).click();
             verificationMessage = getMessage(phoneNumber, countryCode, "462");
-
+            
             if(verificationMessage.equals("no message recieved")) {
                 System.out.println("No message recieved. Retrying");
+                blacklistNumber(phoneNumber, countryCode, "462");
                 verifyPhoneNumber(countryCode);
             }
             else {
@@ -125,12 +136,13 @@ public class SnkrsAccountGen extends AccountGenerator{
             }
 
             typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            driver.findElement(By.id("progressiveMobile")).click();
             try {
                 driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();
             } catch (NoSuchElementException e) {
                 System.out.println("Caught exception while clicking continue. Account still should be verified");
             }
-
+            
             blacklistNumber(phoneNumber, countryCode, "462");
         }
         
@@ -145,7 +157,6 @@ public class SnkrsAccountGen extends AccountGenerator{
         Select birthMonth = new Select(driver.findElement(By.id("nike-unite-date-id-mm")));
         birthMonth.selectByValue(accountInfo.getBirthMonth());
         Select birthDay = new Select(driver.findElement(By.id("nike-unite-date-id-dd")));
-        System.out.println("birth day: " + accountInfo.getBirthDay());
         birthDay.selectByValue(accountInfo.getBirthDay());
         Select birthYear = new Select(driver.findElement(By.id("nike-unite-date-id-yyyy")));
         birthYear.selectByValue(accountInfo.getBirthYear());
@@ -154,8 +165,10 @@ public class SnkrsAccountGen extends AccountGenerator{
 
         if(accountInfo.getGender() == 1) {
             driver.findElement(By.xpath("//span[contains(text(),'Male')]")).click();
+            driver.findElement(By.xpath("//span[contains(text(),'Male')]")).click();
         }
         else {
+            driver.findElement(By.xpath("//span[contains(text(),'Female')]")).click();
             driver.findElement(By.xpath("//span[contains(text(),'Female')]")).click();
         }
         
