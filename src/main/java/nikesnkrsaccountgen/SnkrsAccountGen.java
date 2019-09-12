@@ -19,7 +19,7 @@ public class SnkrsAccountGen extends AccountGenerator{
     }
 
     public Email generateAccount(String countryCode, Email accountInfo) {
-        WebDriverWait waiter = new WebDriverWait(driver, 20);
+        WebDriverWait waiter = new WebDriverWait(driver, 60);
 
         do {
             driver.get("https://www.nike.com/login");
@@ -86,7 +86,7 @@ public class SnkrsAccountGen extends AccountGenerator{
             System.out.println("Got phone number: " + phoneNumber);
 
             try {
-                Thread.sleep(10000);
+                Thread.sleep(15000);
             } catch (InterruptedException e) {
                 System.out.println("Caught exception while waiting for setting refresh");
             }
@@ -134,8 +134,11 @@ public class SnkrsAccountGen extends AccountGenerator{
                 }
                 System.out.println("Verification code is: " + verificationCode);
             }
-
-            typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            try {
+                typeKeys(verificationCode, typingSpeed, driver.findElement(By.xpath("//input[@placeholder='Enter Code']")));
+            } catch (NoSuchElementException e) {
+                System.out.println("Caught exception while entering code. Account still should be verified");
+            }
             driver.findElement(By.id("progressiveMobile")).click();
             try {
                 driver.findElement(By.xpath("//input[@value='CONTINUE']")).click();

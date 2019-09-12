@@ -84,7 +84,17 @@ public class AccountGenerator {
         catch (IOException e) {
             System.out.println("IOException. Please check URL parameters");
         }
-            
+        
+        if(phoneNumber.equals("+Message|unavailable")) {
+            System.out.println("No phone numbers available, waiting a minute");
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                System.out.println("Caught excception while waiting for new phone number");
+            }
+            getPhoneNumber(countryCode, pid);
+        }
+
         return phoneNumber;
     }
 

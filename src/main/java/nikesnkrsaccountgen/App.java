@@ -5,14 +5,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class App {
     public static void main( String[] args ) {
-        // the generator is going to work best if using a vpn/proxy located in Asia or the UK depending on your account verification option
         String countryCode;
         int accountCount;
         String fileName;
+        Boolean headless;
+        Boolean logging;
         Scanner sc = new Scanner(System.in);
 
         System.setProperty("webdriver.gecko.driver","geckodriver.exe");
@@ -24,6 +27,8 @@ public class App {
         System.out.println(" | |\\  |_| |_| . \\| |____    ____) | |\\  | . \\| | \\ \\ ____) |  | |__| | |____| |\\  | |____| | \\ \\  / ____ \\| | | |__| | | \\ \\ ");
         System.out.println(" |_| \\_|_____|_|\\_\\______|  |_____/|_| \\_|_|\\_\\_|  \\_\\_____/    \\_____|______|_| \\_|______|_|  \\_\\/_/    \\_\\_|  \\____/|_|  \\_\\");
         System.out.println("\n\nDeveloped by panda2k");
+        System.out.println("This generator is going to work best if you're using a VPN or proxy that changes your ip location" + 
+                            "to the same location as the phone number you're verifying with. For example, use a UK VPN/proxy if you're generating UK verified accounts");
         System.out.print("\n\nWould you like to generate a UK SNKRS account or CN SNKRS account? ");
         countryCode = sc.nextLine();
         countryCode = countryCode.toLowerCase();
@@ -33,15 +38,17 @@ public class App {
         System.out.print("\nSpecify the file name you would like these accounts to be saved under: ");
         fileName = sc.nextLine();
         fileName += ".txt";
-        //System.out.println("Would you like to run the generator in headless mode? true or false"); todo
-        //headless = sc.nextBoolean(); TODO
+        System.out.print("\nWould you like to run the generator in headless mode? true or false "); 
+        headless = sc.nextBoolean();
+        System.out.print("\nWould you like to log driver messages to console? true or false ");
+        logging = sc.nextBoolean();
 
         Email[] accountList = new Email[accountCount];
 
 
         for(int count = 0; count < accountCount; count++) {
             System.out.println("Now generating account");
-            accountList[count] = generateSnkrsAccount(countryCode);
+            accountList[count] = generateSnkrsAccount(countryCode, headless, logging);
             writeAccountToFile(new File(fileName), accountList[count]);
 
             System.out.println("Finished generating account");
@@ -52,9 +59,34 @@ public class App {
         sc.close();
     }
     
-    public static Email generateSnkrsAccount(String countryCode) {
+    public static Email generateSnkrsAccount(String countryCode, boolean headless, boolean logging) {
+        WebDriver driver = null;
+
         System.out.println("Creating driver and generator objects");
-        WebDriver driver = new FirefoxDriver();
+        if(headless) {
+            System.out.println("Entering headless mode");
+            FirefoxBinary binary = new FirefoxBinary();
+            binary.addCommandLineOptions("--headless");
+
+            FirefoxOptions options = new FirefoxOptions();
+            options.setBinary(binary);
+            if(logging == false) {
+                System.out.println("Disabling logging");
+                System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE,"true");
+                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"log.txt");
+            }
+
+            driver = new FirefoxDriver(options);
+        }
+        else {
+            if(logging == false) {
+                System.out.println("Disabling logging");
+                System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE,"true");
+                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"log.txt");
+            }
+            driver = new FirefoxDriver();
+        }
+
         ProtonmailGenerator emailGen = new ProtonmailGenerator(driver);
         SnkrsAccountGen nikeGen = new SnkrsAccountGen(driver);
 
@@ -92,7 +124,6 @@ public class App {
         } catch (IOException e) {
             System.out.println("Caught IOException while closing FileWriter");
         }
-
         System.out.println("Finished writing account to file");
     }
 }

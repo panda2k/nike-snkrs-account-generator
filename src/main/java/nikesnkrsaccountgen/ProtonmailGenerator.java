@@ -19,19 +19,31 @@ public class ProtonmailGenerator extends AccountGenerator{
     }
 
     public Email generateAccount() {
-        WebDriverWait waiter = new WebDriverWait(driver, 15);
+        System.out.println("Generating protonmail account");
+        WebDriverWait waiter = new WebDriverWait(driver, 60);
+        System.out.println("Initialized waiter object");
         Email newEmail;
+        System.out.println("Initialized email object");
         String firstName = getFirstName();
+        System.out.println("Retrieved first name");
         String lastName = getLastName();
+        System.out.println("Retrieved last name");
         String emailAddress = firstName + lastName.charAt(0) + randomNumberString(10);
+        System.out.println("Determined email address");
         String password = randomPassword(10);
+        System.out.println("Generated password");
         String phoneNumber = getPhoneNumber("cn", "404");
+        System.out.println("Retrieved phone number");
         Actions builder = new Actions(driver);
+        System.out.println("Initialized Action builder");
         String verificationMessage;
         String verificationCode = "";
+        System.out.println("Initialized verification strings");
+
+        System.out.println("Initialized all objects and variables in proton mail generator");
         
         driver.get("https://mail.protonmail.com/create/new?language=en");
-
+        System.out.println("Retrieved Signup Page");
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
@@ -119,7 +131,7 @@ public class ProtonmailGenerator extends AccountGenerator{
     private void fillEmailProfile(Email newEmail) {
         Random randomGen = new Random();
 
-        newEmail.setGender(randomGen.nextInt(2) + 1);
-        newEmail.setDateOfBirth(new GregorianCalendar(randomGen.nextInt(20) + 1970, randomGen.nextInt(12) + 1, randomGen.nextInt(28) + 1));
+        newEmail.setGender((randomGen.nextInt(2) + 1));
+        newEmail.setDateOfBirth(new GregorianCalendar((randomGen.nextInt(20) + 1970), (randomGen.nextInt(12) + 1), (randomGen.nextInt(28) + 1)));
     }
 }
