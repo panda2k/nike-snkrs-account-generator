@@ -16,6 +16,7 @@ public class App {
         String fileName;
         Boolean headless;
         Boolean logging;
+        Boolean realEmail;
         Scanner sc = new Scanner(System.in);
 
         System.setProperty("webdriver.gecko.driver","geckodriver.exe");
@@ -27,7 +28,7 @@ public class App {
         System.out.println(" | |\\  |_| |_| . \\| |____    ____) | |\\  | . \\| | \\ \\ ____) |  | |__| | |____| |\\  | |____| | \\ \\  / ____ \\| | | |__| | | \\ \\ ");
         System.out.println(" |_| \\_|_____|_|\\_\\______|  |_____/|_| \\_|_|\\_\\_|  \\_\\_____/    \\_____|______|_| \\_|______|_|  \\_\\/_/    \\_\\_|  \\____/|_|  \\_\\");
         System.out.println("\n\nDeveloped by panda2k");
-        System.out.println("This generator is going to work best if you're using a VPN or proxy that changes your ip location" + 
+        System.out.println("This generator is going to work best if you're using a VPN or proxy that changes your ip location " + 
                             "to the same location as the phone number you're verifying with. For example, use a UK VPN/proxy if you're generating UK verified accounts");
         System.out.print("\n\nWould you like to generate a UK SNKRS account or CN SNKRS account? ");
         countryCode = sc.nextLine();
@@ -42,13 +43,15 @@ public class App {
         headless = sc.nextBoolean();
         System.out.print("\nWould you like to log driver messages to console? true or false ");
         logging = sc.nextBoolean();
+        System.out.print("\nWould you like to generate real emails for each account? true or false ");
+        realEmail = sc.nextBoolean();
 
         Email[] accountList = new Email[accountCount];
 
 
         for(int count = 0; count < accountCount; count++) {
             System.out.println("Now generating account");
-            accountList[count] = generateSnkrsAccount(countryCode, headless, logging);
+            accountList[count] = generateSnkrsAccount(countryCode, headless, logging, realEmail);
             writeAccountToFile(new File(fileName), accountList[count]);
 
             System.out.println("Finished generating account");
@@ -59,8 +62,9 @@ public class App {
         sc.close();
     }
     
-    public static Email generateSnkrsAccount(String countryCode, boolean headless, boolean logging) {
+    public static Email generateSnkrsAccount(String countryCode, boolean headless, boolean logging, boolean realEmail) {
         WebDriver driver = null;
+        Email accountEmail = null;
 
         System.out.println("Creating driver and generator objects");
         if(headless) {
@@ -87,11 +91,18 @@ public class App {
             driver = new FirefoxDriver();
         }
 
-        ProtonmailGenerator emailGen = new ProtonmailGenerator(driver);
+        if(realEmail) {
+            ProtonmailGenerator emailGen = new ProtonmailGenerator(driver);
+            accountEmail = emailGen.generateAccount();
+        }
+        else {
+            GmailGen emailGen = new GmailGen(driver);
+            accountEmail = emailGen.generateFakeEmail();
+        }
+        System.out.println("Email generated: " + accountEmail.toString());
+
         SnkrsAccountGen nikeGen = new SnkrsAccountGen(driver);
 
-        Email accountEmail = emailGen.generateAccount();
-        System.out.println("Protonmail Account generated. Here are the details: " + accountEmail.toString());
         Email account = nikeGen.generateAccount(countryCode, accountEmail);
 
         System.out.println("SNKRS Account generated. Here are the details: " + account.toString());

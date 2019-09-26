@@ -1,8 +1,5 @@
 package nikesnkrsaccountgen;
 
-import java.util.GregorianCalendar;
-import java.util.Random;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
@@ -126,12 +123,5 @@ public class ProtonmailGenerator extends AccountGenerator{
                 System.out.println("Error when trying to pause keystrokes.");
             }
         }
-    }
-
-    private void fillEmailProfile(Email newEmail) {
-        Random randomGen = new Random();
-
-        newEmail.setGender((randomGen.nextInt(2) + 1));
-        newEmail.setDateOfBirth(new GregorianCalendar((randomGen.nextInt(20) + 1970), (randomGen.nextInt(12) + 1), (randomGen.nextInt(28) + 1)));
     }
 }

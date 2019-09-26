@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -218,5 +219,12 @@ public class AccountGenerator {
         lastName = lastNames.get(randomGen.nextInt(lastNames.size()));
         
         return lastName;
+    }
+
+    public void fillEmailProfile(Email newEmail) {
+        Random randomGen = new Random();
+
+        newEmail.setGender((randomGen.nextInt(2) + 1));
+        newEmail.setDateOfBirth(new GregorianCalendar((randomGen.nextInt(20) + 1970), (randomGen.nextInt(12) + 1), (randomGen.nextInt(28) + 1)));
     }
 }

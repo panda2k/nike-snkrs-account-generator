@@ -13,10 +13,9 @@ public class GmailGen extends AccountGenerator{
     WebDriver driver;
     final int startingTypeSpeed = 75;
 
-    private Email newGmail;
 
-    public GmailGen() {
-        driver = new FirefoxDriver();
+    public GmailGen(WebDriver driver) {
+        this.driver = driver;
     }
 
     public void generateGmail(String proxy) {
@@ -26,6 +25,8 @@ public class GmailGen extends AccountGenerator{
     }
 
     public Email generateGmail() {
+        Email newGmail;
+
         Random randomGen = new Random();
         String emailEnding = randomNumberString(10);
         String password = randomPassword(10);
@@ -74,7 +75,7 @@ public class GmailGen extends AccountGenerator{
         blacklistNumber(phoneNumber, "uk", "1");
 
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("month"))); 
-        enterRandomInfo();
+        enterRandomInfo(newGmail);
         driver.findElement(By.id("personalDetailsNext")).click();
         waiter.until(ExpectedConditions.elementToBeClickable(By.id("phoneUsageNext"))); 
         driver.findElement(By.id("phoneUsageNext")).click();
@@ -98,7 +99,34 @@ public class GmailGen extends AccountGenerator{
         return newGmail;
     }
 
-    private void enterRandomInfo() {
+    public Email generateFakeEmail() {
+        Email newGmail;
+        String firstName = getFirstName();
+        String lastName = getLastName();
+        String password = randomPassword(10);
+        Random randomGen = new Random();
+        String emailEnding;
+
+        driver.get("https://accounts.google.com/SignUp");
+        typeKeys(firstName, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("firstName")));
+        typeKeys(lastName, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("lastName")));
+        typeKeys(password, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("Passwd")));
+        typeKeys(password, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("ConfirmPasswd")));
+        
+        // keep trying email addresses until they are valid
+        do {
+            emailEnding = randomNumberString(10);
+            typeKeys(firstName + lastName.charAt(0) + emailEnding, randomGen.nextInt(11) + startingTypeSpeed, driver.findElement(By.name("Username")));
+            driver.findElement(By.xpath("//*[contains(text(), 'Next')]")).click();
+        } while(driver.findElements(By.xpath("//*[contains(text(), 'That username is taken. Try another.')]")).size() != 0);
+
+        newGmail = new Email(firstName + lastName.charAt(0) + emailEnding, password);
+        fillEmailProfile(newGmail);
+
+        return newGmail;
+    }
+
+    private void enterRandomInfo(Email newGmail) {
     /**
     * Generates random information for a google login for
     * only to be used when the driver is on the google information screen
