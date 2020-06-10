@@ -34,10 +34,11 @@ public class App {
 
         System.out.println("1. Nike SNKRS Account Generator");
         System.out.println("2. Nike SNKRS Account Activity Generator");
-        System.out.println("Please type the number corresponding to the option you would like to choose ");
+        System.out.print("Please type the number corresponding to the option you would like to choose ");
         option = sc.nextInt();
+        sc.nextLine();
         if(option == 1) {
-            System.out.println("This generator is going to work best if you're using a VPN or proxy that changes your ip location " + 
+            System.out.println("\nThis generator is going to work best if you're using a VPN or proxy that changes your ip location " + 
             "to the same location as the phone number you're verifying with. For example, use a UK VPN/proxy if you're generating UK verified accounts");
             System.out.print("\n\nWould you like to generate a UK SNKRS account or CN SNKRS account? ");
             countryCode = sc.nextLine();
@@ -69,7 +70,7 @@ public class App {
             System.out.println("Finished generating all accounts");
         }
         else {
-            System.out.print("Specify the name of the text file containing the Nike accounts you would like to generate activity on. " +  
+            System.out.print("\nSpecify the name of the text file containing the Nike accounts you would like to generate activity on. " +  
             "Do not omit the file extension .txt and make sure the accounts are in email:password format. ");
             fileName = sc.nextLine();
             System.out.print("\nWould you like to run the activity generator in headless mode? true or false ");
