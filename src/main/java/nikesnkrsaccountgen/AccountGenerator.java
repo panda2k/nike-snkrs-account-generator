@@ -17,8 +17,8 @@ import org.apache.http.util.EntityUtils;
 import org.openqa.selenium.WebElement;
 
 public class AccountGenerator {
-    final String username = "littlwang@gmail.com";
-    final String token = "36d0674c163d6b68ae2ccc89e461ed1f";
+    final String username = "";
+    final String token = "";
 
     CloseableHttpClient requestsClient = HttpClients.createDefault();
     ResponseHandler errorHandler = new ResponseHandler<String>() {
